@@ -1,204 +1,180 @@
 import Head from 'next/head'
+import { Component } from 'react'
 
-export default function Home() {
-  return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import Request from '../helpers/api';
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+import AddModal from '../components/add';
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
+export default class Home extends Component {
+  constructor () {
+    super()
+    this.state = {
+      data: [],
+      modalData: {},
+    }
+  }
 
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+  initialFetch () {
+    Request.get('part').then(res => {
+      const { data } = res;
+      this.setState({ data })
+    }).catch(err => {
+      console.log(err)
+    });
+  }
 
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+  handleEdit (id) {
+    $(`#edit-modal-${id}`).modal('show');
+  }
 
-          <a
-            href="https://github.com/zeit/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+  handleDelete (id) {
+    Request.delete(`part/${id}`)
+      .then(res => {
+        this.initialFetch()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
-          <a
-            href="https://zeit.co/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with ZEIT Now.
-            </p>
-          </a>
-        </div>
-      </main>
+  handleSave ({ name, code, quantity, status, destination, description, position }) {
+    const params = {
+      name,
+      code,
+      quantity,
+      status,
+      destination,
+      description,
+      position,
+      production_date: new Date(),
+    };
 
-      <footer>
-        <a
-          href="https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/zeit.svg" alt="ZEIT Logo" />
-        </a>
-      </footer>
+    Request.post('part', params)
+      .then(res => {
+        this.initialFetch()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+  onEdit (params) {
+    const { id } = params;
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+    Request.put(`part/${id}`, params)
+      .then(res => {1
+        this.initialFetch()
+        this.forceUpdate()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+  componentDidMount () {
+    this.initialFetch();
+  }
 
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
+  render () {
+    const { data, modalData } = this.state;
+    return (
+      <div className="container">
+        <Head>
+          <title>Warehouse</title>
+          <link rel="icon" href="/favicon.ico" />
+          <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+          <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
+        </Head>
+  
+        <main className="p-5">
+          <AddModal id="add-modal"  onSave={this.handleSave.bind(this)} />
+          <div className="d-flex justify-content-between mb-3">
+            <h3 className="m-0 p-0">Product</h3>
+            <button type="button" className="btn btn-sm btn-primary"  data-toggle="modal" data-target="#add-modal">+ Add New Product</button>
+          </div>
+          <div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Code</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Destination</th>
+                  <th scope="col">Position</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  Array.isArray(data) && data.length ? (
+                    data.map(({
+                      id = 0,
+                      name = '',
+                      code = '',
+                      quantity = '',
+                      status = '',
+                      destination = '',
+                      position = '',
+                      description = '',
+                      production_date = '',
+                    } = {}, index) => {
+                      return (
+                        <>
+                          <AddModal id={`edit-modal-${id}`} data={{ id, name, code, quantity, status, destination, description, position, production_date }}  onSave={this.onEdit.bind(this)} />
+                          <tr key={index}>
+                            <th scope="row">{ index + 1 }</th>
+                            <td>{name}</td>
+                            <td>{code}</td>
+                            <td>{quantity}</td>
+                            <td>{status}</td>
+                            <td>{destination}</td>
+                            <td>{position}</td>
+                            <td className="d-flex">
+                              <button onClick={this.handleEdit.bind(this, id)} type="button" className="btn btn-sm btn-primary mr-3">Edit</button>
+                              <button onClick={this.handleDelete.bind(this, id)} type="button" className="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                          </tr>
+                        </>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="text-center">The data is empty</td>
+                    </tr>
+                  ) 
+                }
+              </tbody>
+            </table>
+          </div>
+        </main>
+  
+        <footer>
+         
+        </footer>
+  
+        <style jsx>{`
+         
+        `}</style>
+  
+        <style jsx global>{`
+          html,
+          body {
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+              Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+              sans-serif;
           }
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  )
+  
+          * {
+            box-sizing: border-box;
+          }
+        `}</style>
+      </div>
+    )
+  }
 }

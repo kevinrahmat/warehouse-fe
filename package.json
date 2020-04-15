@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8080",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p 8008"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "next": "9.3.5",
     "react": "16.13.1",
     "react-dom": "16.13.1"
