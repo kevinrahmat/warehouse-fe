@@ -56,6 +56,10 @@ export default class Add extends React.Component {
     }
   }
 
+  componentDidMount () {
+    $('.selectpicker').selectpicker('show');
+  }
+
   render () {
     const {
       name,
@@ -94,9 +98,14 @@ export default class Add extends React.Component {
                   <input value={quantity} onChange={(event) => this.handleChangeInput( event, 'quantity' )} className="form-control" id="product-name" placeholder="Enter product quantity" />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group d-flex justify-content-between align-items-center">
                   <label htmlFor="product-status">Product Status</label>
-                  <input value={status} onChange={(event) => this.handleChangeInput( event, 'status' )} className="form-control" id="product-status" placeholder="Enter product status" />
+                  <select onChange={(event) => this.handleChangeInput( event, 'status' )}  className="selectpicker">
+                    <option value="Passed">Passed</option>
+                    <option value="Broken">Broken</option>
+                  </select>
+
+                  {/* <input value={status} onChange={(event) => this.handleChangeInput( event, 'status' )} className="form-control" id="product-status" placeholder="Enter product status" /> */}
                 </div>
 
                 <div className="form-group">
@@ -110,8 +119,8 @@ export default class Add extends React.Component {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="product-description">Product Description</label>
-                  <textarea value={description} onChange={(event) => this.handleChangeInput( event, 'description' )} className="form-control" id="product-description" placeholder="Enter product description" />
+                  <label htmlFor="product-description">Product Information</label>
+                  <textarea value={description} onChange={(event) => this.handleChangeInput( event, 'description' )} className="form-control" id="product-description" placeholder="Enter product information" />
                 </div>
 
                 <div className="d-flex justify-content-end">
