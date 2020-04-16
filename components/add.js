@@ -20,7 +20,7 @@ export default class Add extends React.Component {
       name: name || '',
       code: code ||  '',
       quantity: quantity ||  '',
-      status: status ||  '',
+      status: status ||  'Passed',
       destination: destination ||  '',
       position: position ||  '',
       description: description ||  '',
@@ -100,7 +100,7 @@ export default class Add extends React.Component {
 
                 <div className="form-group d-flex justify-content-between align-items-center">
                   <label htmlFor="product-status">Product Status</label>
-                  <select value={status} defaultValue="Passed" onChange={(event) => this.handleChangeInput( event, 'status' )}  className="selectpicker">
+                  <select value={status} onChange={(event) => this.handleChangeInput( event, 'status' )}  className="selectpicker">
                     <option value="Passed">Passed</option>
                     <option value="Broken">Broken</option>
                   </select>
