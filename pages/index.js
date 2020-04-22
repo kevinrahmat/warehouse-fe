@@ -14,6 +14,19 @@ export default class Home extends Component {
       data: [],
       reportData: [],
       modalData: {},
+      renderTrackModal: true,
+      notificationCount: 0,
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    const prevLength = prevState.reportData.length
+    const length = this.state.reportData.length
+    if (prevLength) {
+      if (prevLength !== length) {
+        const difference = Math.abs(prevLength - length);
+        this.setState((prev) => ({ notificationCount: prev.notificationCount + difference }))
+      }
     }
   }
 
@@ -89,8 +102,10 @@ export default class Home extends Component {
   }
 
   async initialFetch () {
+    this.setState({ renderTrackModal: false });
     await this.getPart();
     await this.getReport();
+    this.setState({ renderTrackModal: true });
   }
 
   async handleDelete (id, index) {
@@ -120,6 +135,7 @@ export default class Home extends Component {
 
     await this.putPart(id, params);  
     await this.postReport({ ...params, actions: 'EDIT'})
+    await this.initialFetch();
   }
 
   handleEditModal (id) {
@@ -127,6 +143,7 @@ export default class Home extends Component {
   }
 
   handleReportModal () {
+    this.setState({ notificationCount: 0 })
     $('#report-modal').modal('show');
   }
   handleTrackModal(id) {
@@ -137,7 +154,7 @@ export default class Home extends Component {
   }
 
   render () {
-    const { data, modalData, reportData } = this.state;
+    const { data, renderTrackModal, reportData, notificationCount } = this.state;
     return (
       <div>
         <Head>
@@ -159,7 +176,10 @@ export default class Home extends Component {
             <h3 className="m-0 p-0">Product</h3>
             <div className="d-flex">
               <button type="button" className="btn btn-sm btn-primary"  data-toggle="modal" data-target="#add-modal">+ Add New Product</button>
-              <button onClick={this.handleReportModal.bind(this)} style={{ width: 70 }} type="button" className="btn btn-sm btn-primary ml-2">Report</button>
+              <div className="position-relative">
+                <p style={{ color: 'white', borderRadius: 50, fontSize: 11, right: '-10px', top: '-10px' }} className="position-absolute bg-danger p-1 text-center">{notificationCount}</p>
+                <button onClick={this.handleReportModal.bind(this)} style={{ width: 70 }} type="button" className="btn btn-sm btn-primary ml-2">Report</button>
+              </div>
               {/* <button type="button" className="btn btn-sm btn-primary ml-2" >
                 <FontAwesomeIcon style={{ color: 'white' }} icon={faBell} width={15} />
               </button> */}
@@ -198,8 +218,11 @@ export default class Home extends Component {
                       const date = new Date(production_date);
                       return (
                         <>
-                          <AddModal id={`edit-modal-${id}`} data={{ id, name, code, quantity, status, destination, description, position, production_date }}  onSave={this.handleEdit.bind(this)} />
-                          <TrackingModal id={`tracking-modal-${id}`} destination={destination} position={position} />
+                          <AddModal key={index} id={`edit-modal-${id}`} data={{ id, name, code, quantity, status, destination, description, position, production_date }}  onSave={this.handleEdit.bind(this)} />
+                          {
+                            renderTrackModal && 
+                              <TrackingModal key={index} id={`tracking-modal-${id}`} destination={destination} position={position} />
+                          }
                           <tr key={index}>
                             <th scope="row">{ index + 1 }</th>
                             <td>{name}</td>

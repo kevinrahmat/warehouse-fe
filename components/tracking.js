@@ -28,7 +28,7 @@ export default class Add extends React.Component {
   render () {
     const { data } = this.state;
     return (
-      <div id={this.props.id} className="modal" tabIndex="-1" role="dialog">
+      <div id={this.props.id} className="modal fade" tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
@@ -39,9 +39,28 @@ export default class Add extends React.Component {
             </div>
             <div className="modal-body">
               { Array.isArray(data) && data.map((item, index) => (
-                <div style={index === 0 ? {} : { marginTop: 10 }} key={index} class="shadow-sm rounded">
-                  <div class="card-body">
-                    {item}
+                <div
+                  key={index}
+                  className="shadow-sm rounded"
+                  style={
+                    index == 0 ? 
+                      { background: 'rgba(2,123,255,0.8)', color: 'white' }
+                     : (index !== data.length - 1 ? 
+                      { marginTop: 10, background: 'rgba(108, 117, 125, 0.8)', color: 'white'}
+                     : { marginTop: 10, background: 'rgba(40,167,69,0.8)', color: 'white'})
+                  }
+                >
+                  <div className="card-body">
+                    <p style={{ fontWeight: 600, fontSize: 11 }} className="m-0">
+                      {
+                        index == 0 ? 
+                        'Started Warehouse'
+                       : (index !== data.length - 1 ? 
+                        'Passed Warehouse'
+                       : 'Current Warehouse')
+                      }
+                    </p>
+                    <p style={{ fontWeight: "normal" }} className="m-0">{item}</p>
                   </div>
                 </div>
               ))}

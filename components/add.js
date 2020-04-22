@@ -16,7 +16,7 @@ export default class Add extends React.Component {
     } = {} } = props;
 
     this.state = {
-      id: id || '',
+      id: id || null,
       name: name || '',
       code: code ||  '',
       quantity: quantity ||  '',
@@ -102,7 +102,7 @@ export default class Add extends React.Component {
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Add New Product</h5>
+              <h5 className="modal-title" id="exampleModalLabel">{this.state.id ? 'Edit' : 'Add'} New Product</h5>
               <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>

@@ -36,7 +36,7 @@ export default class Report extends React.Component {
               <tbody>
                 {
                   Array.isArray(data) && data.length ? (
-                    data.map(({
+                    data.reverse().map(({
                       name = '',
                       status = '',
                       destination = '',
