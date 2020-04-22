@@ -5,19 +5,20 @@ import { faBell } from '@fortawesome/free-solid-svg-icons'
 
 import Request from '../helpers/api';
 
-import AddModal from '../components/add';
+import { AddModal, ReportModal } from '../components';
 
 export default class Home extends Component {
   constructor () {
     super()
     this.state = {
       data: [],
+      reportData: [],
       modalData: {},
     }
   }
 
-  initialFetch () {
-    Request.get('part').then(res => {
+  getPart () {
+    return Request.get('part').then(res => {
       const { data } = res;
       this.setState({ data })
     }).catch(err => {
@@ -25,12 +26,8 @@ export default class Home extends Component {
     });
   }
 
-  handleEdit (id) {
-    $(`#edit-modal-${id}`).modal('show');
-  }
-
-  handleDelete (id) {
-    Request.delete(`part/${id}`)
+  deletePart (id) {
+    return Request.delete(`part/${id}`)
       .then(res => {
         this.initialFetch()
       })
@@ -39,7 +36,70 @@ export default class Home extends Component {
       })
   }
 
-  handleSave ({ name, code, quantity, status, destination, description, position }) {
+  postPart (params) {
+    return Request.post('part', params)
+      .then(res => {
+        this.initialFetch()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  putPart (id, params) {
+    return Request.put(`part/${id}`, params)
+      .then(res => {1
+        this.initialFetch()
+        this.forceUpdate()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  getReport () {
+    return Request.get('report').then(res => {
+      const { data } = res;
+      this.setState({ reportData: data }, () => { this.forceUpdate() })
+    }).catch(err => {
+      console.log(err)
+    });
+  }
+
+  postReport ({ name, code, quantity, status, destination, description, position, actions }) {
+    const params = {
+      name,
+      code,
+      quantity,
+      status,
+      destination,
+      description,
+      position,
+      actions,
+      date: new Date()
+    }
+    
+    return Request.post('report', params)
+      .then(res => {
+        this.initialFetch()
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  async initialFetch () {
+    await this.getPart();
+    await this.getReport();
+  }
+
+  async handleDelete (id, index) {
+    const params = this.state.data[index]
+    this.deletePart(id)
+    await this.postReport({ ...params, actions: 'DELETE'})
+  }
+
+  async handleSave ({ name, code, quantity, status, destination, description, position }) {
     const params = {
       name,
       code,
@@ -51,34 +111,31 @@ export default class Home extends Component {
       production_date: new Date(),
     };
 
-    Request.post('part', params)
-      .then(res => {
-        this.initialFetch()
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    await this.postPart(params)
+    await this.postReport({ ...params, actions: 'ADD'})
   }
 
-  onEdit (params) {
+  async handleEdit (params) {
     const { id } = params;
 
-    Request.put(`part/${id}`, params)
-      .then(res => {1
-        this.initialFetch()
-        this.forceUpdate()
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    await this.putPart(id, params);  
+    await this.postReport({ ...params, actions: 'EDIT'})
   }
 
+  handleEditModal (id) {
+    $(`#edit-modal-${id}`).modal('show');
+  }
+
+  handleReportModal () {
+    $('#report-modal').modal('show');
+  }
   componentDidMount () {
     this.initialFetch();
   }
 
   render () {
-    const { data, modalData } = this.state;
+    const { data, modalData, reportData } = this.state;
+    console.log(reportData)
     return (
       <div>
         <Head>
@@ -94,14 +151,16 @@ export default class Home extends Component {
         </Head>
   
         <main className="p-5">
-          <AddModal id="add-modal"  onSave={this.handleSave.bind(this)} />
+          <AddModal id="add-modal" onSave={this.handleSave.bind(this)} />
+          <ReportModal id="report-modal" data={reportData} />
           <div className="d-flex justify-content-between mb-3">
             <h3 className="m-0 p-0">Product</h3>
             <div className="d-flex">
               <button type="button" className="btn btn-sm btn-primary"  data-toggle="modal" data-target="#add-modal">+ Add New Product</button>
-              <button type="button" className="btn btn-sm btn-primary ml-2" >
+              <button onClick={this.handleReportModal.bind(this)} style={{ width: 70 }} type="button" className="btn btn-sm btn-primary ml-2">Report</button>
+              {/* <button type="button" className="btn btn-sm btn-primary ml-2" >
                 <FontAwesomeIcon style={{ color: 'white' }} icon={faBell} width={15} />
-              </button>
+              </button> */}
             </div>
           </div>
           <div>
@@ -137,7 +196,7 @@ export default class Home extends Component {
                       const date = new Date(production_date);
                       return (
                         <>
-                          <AddModal id={`edit-modal-${id}`} data={{ id, name, code, quantity, status, destination, description, position, production_date }}  onSave={this.onEdit.bind(this)} />
+                          <AddModal id={`edit-modal-${id}`} data={{ id, name, code, quantity, status, destination, description, position, production_date }}  onSave={this.handleEdit.bind(this)} />
                           <tr key={index}>
                             <th scope="row">{ index + 1 }</th>
                             <td>{name}</td>
@@ -149,10 +208,9 @@ export default class Home extends Component {
                             <td>{position}</td>
                             <td>{date.toDateString()}</td>
                             <td className="d-flex">
-                              <button style={{ width: 70 }} onClick={this.handleEdit.bind(this, id)} type="button" className="btn btn-sm btn-secondary mr-3">Edit</button>
-                              <button style={{ width: 70 }} type="button" className="btn btn-sm btn-primary mr-3">Report</button>
+                              <button style={{ width: 70 }} onClick={this.handleEditModal.bind(this, id)} type="button" className="btn btn-sm btn-secondary mr-3">Edit</button>
                               <button style={{ width: 70 }} type="button" className="btn btn-sm btn-info mr-3">Track</button>
-                              <button style={{ width: 70 }} onClick={this.handleDelete.bind(this, id)} type="button" className="btn btn-sm btn-danger mr-3">Delete</button>
+                              <button style={{ width: 70 }} onClick={this.handleDelete.bind(this, id, index)} type="button" className="btn btn-sm btn-danger mr-3">Delete</button>
                             </td>
                           </tr>
                         </>
@@ -160,7 +218,7 @@ export default class Home extends Component {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="7" className="text-center">The data is empty</td>
+                      <td colSpan="10" className="text-center">The data is empty</td>
                     </tr>
                   ) 
                 }

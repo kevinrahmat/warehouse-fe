@@ -2,107 +2,17 @@ import React from 'react';
 
 export default class Add extends React.Component {
   constructor(props) {
-    super(props)
-    const { data: {
-      id,
-      name,
-      code,
-      quantity,
-      status,
-      destination,
-      position,
-      description,
-      production_date,
-    } = {} } = props;
-
-    this.state = {
-      id: id || '',
-      name: name || '',
-      code: code ||  '',
-      quantity: quantity ||  '',
-      status: status ||  'Passed',
-      destination: destination ||  'Warehouse 1',
-      position: position ||  'Warehouse 2',
-      description: description ||  '',
-      production_date: production_date ||  '',
-      warehouse_list: [
-        {
-          label: 'Warehouse 1',
-        },
-        {
-          label: 'Warehouse 2',
-        },
-        {
-          label: 'Warehouse 3',
-        },
-        {
-          label: 'Warehouse 4',
-        },
-        {
-          label: 'Warehouse 5',
-        },
-        {
-          label: 'Warehouse 6',
-        },
-        {
-          label: 'Warehouse 7',
-        },
-        {
-          label: 'Warehouse 8',
-        },
-      ]
-    }
-  }
-
-  resetState () {
-    this.setState({
-      name: '',
-      code: '',
-      quantity: '',
-      status: '',
-      destination: '',
-      position: '',
-      description: '',
-      production_date: '',
-    })
-  }
-
-  handleChangeInput (event, type) {
-    this.setState({
-      [type]: event.target.value
-    })
-  }
-
-  onSave (event) {
-    event.preventDefault();
-    this.props.onSave(this.state);
-    $(`#${this.props.id}`).modal('hide');
-    if (this.props.id.split('-')[0] === 'add') {
-      this.resetState();
-    }
-  }
-
-  componentDidMount () {
-    $('.selectpicker').selectpicker('show');
+    super()
+    this.state = {}
   }
 
   render () {
-    const {
-      name,
-      code,
-      quantity,
-      status,
-      destination,
-      description,
-      position,
-      warehouse_list,
-    } = this.state;
     return (
       <div className="modal fade" id={this.props.id} tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Add New Product</h5>
+              <h5 className="modal-title" id="exampleModalLabel">Product Tracking</h5>
               <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -136,20 +46,20 @@ export default class Add extends React.Component {
                 <div className="form-group d-flex justify-content-between align-items-center">
                   <label htmlFor="product-destination">Product Destination</label>
                   <select value={destination} onChange={(event) => this.handleChangeInput( event, 'destination' )}  className="selectpicker">
-                    {Array.isArray(warehouse_list) && warehouse_list.map(({ label }, index) => {
+                    {Array.isArray(warehouse_list) && warehouse_list.map(({ label, value }) => {
                       return (
-                        <option key={index} value={label}>{label}</option>
+                        <option value={value}>{label}</option>
                       );
                     })}
                   </select>
                 </div>
 
                 <div className="form-group d-flex justify-content-between align-items-center">
-                  <label htmlFor="product-position">Product Position</label>
+                  <label htmlFor="product-position">Product Destination</label>
                   <select value={position} onChange={(event) => this.handleChangeInput( event, 'position' )}  className="selectpicker">
-                    {Array.isArray(warehouse_list) && warehouse_list.map(({ label }, index) => {
+                    {Array.isArray(warehouse_list) && warehouse_list.map(({ label }) => {
                       return (
-                        <option key={index} value={label}>{label}</option>
+                        <option value={label}>{label}</option>
                       );
                     })}
                   </select>
@@ -170,6 +80,6 @@ export default class Add extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
