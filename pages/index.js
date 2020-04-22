@@ -135,7 +135,6 @@ export default class Home extends Component {
 
   render () {
     const { data, modalData, reportData } = this.state;
-    console.log(reportData)
     return (
       <div>
         <Head>

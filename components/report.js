@@ -87,6 +87,7 @@ export default class Report extends React.Component {
           }
           
           #${this.props.id} .modal-content {
+            overflow: scroll;
             height: 90%;
             border-radius: 0;
             width: 90%;
